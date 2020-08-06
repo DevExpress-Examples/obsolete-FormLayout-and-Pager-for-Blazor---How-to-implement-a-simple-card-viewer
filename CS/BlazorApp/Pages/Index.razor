@@ -1,0 +1,80 @@
+﻿@page "/"
+
+@using BlazorApp.Data
+@using Microsoft.AspNetCore.Hosting
+@inject IWebHostEnvironment env
+
+<DxPager PageCount="@PageCount"
+         ActivePageIndex="@ActivePageIndex"
+         ActivePageIndexChanged="@((value) => ActivePageIndexChanged(value))">
+</DxPager>
+
+<div class="mt-1 mb-3 border-bottom border-primary">
+    @if (HomesDS != null) {
+        int start = ActivePageIndex * PageSize;
+        int end = ((start + PageSize) > HomesDS.Count) ? HomesDS.Count : (start + PageSize);
+        for (int i = start; i < end; i++) {
+            Homes home = HomesDS[i];
+            <DxFormLayout CssClass="border border-primary border-bottom-0">
+                <DxFormLayoutItem ColSpanMd="12" ColSpanLg="3">
+                    <Template>
+                        <div class="text-center">
+                            <img src="Images/@home.PhotoUrl" class="m-auto w-75" />
+                        </div>
+                    </Template>
+                </DxFormLayoutItem>
+
+                <DxFormLayoutItem ColSpanMd="12" ColSpanLg="9">
+                    <Template>
+                        <h3>@home.Address</h3>
+                        <p>
+                            Beds: @home.Beds / Baths: @home.Baths / Size: @home.HouseSize / Year: @home.YearBuilt
+                        </p>
+                        <div class="text-muted">
+                            @home.Features.Substring(0, 200)
+                            <a href="#" class="target-container" @onclick="@(() => ShowDetails(home.Features))">...More details</a>
+                        </div>
+                    </Template>
+                </DxFormLayoutItem>
+
+                <DxFormLayoutItem ColSpanMd="12">
+                    <Template>
+                        <h5 class="float-right">@string.Format("{0:C}", home.Price)</h5>
+                    </Template>
+                </DxFormLayoutItem>
+            </DxFormLayout>
+        }
+    }
+</div>
+
+<DxPopup HeaderText="Details" @bind-Visible="@PopupVisible">
+    <Content>
+        @Details
+    </Content>
+</DxPopup>
+
+@code{
+    List<Homes> HomesDS;
+    int PageCount = 0;
+    int PageSize = 3;
+    int ActivePageIndex = 0;
+    bool PopupVisible = false;
+    string Details;
+
+    protected override void OnInitialized() {
+        HomesProvider provider = new HomesProvider(env);
+        HomesDS = provider.GetDataFormXml();
+        int homesCount = HomesDS.Count;
+        PageCount = (homesCount / PageSize) + 1;
+        base.OnInitialized();
+    }
+    void ActivePageIndexChanged(int value) {
+        ActivePageIndex = value;
+        InvokeAsync(StateHasChanged);
+    }
+    void ShowDetails(string details) {
+        PopupVisible = true;
+        Details = details;
+        StateHasChanged();
+    }
+}
