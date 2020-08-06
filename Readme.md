@@ -1,4 +1,4 @@
-#FormLayout and Pager for Blazor - How to implement a simple card viewer
+# FormLayout and Pager for Blazor - How to implement a simple card viewer
 
 *Files to look at*:
 -   [Index.razor](./CS/Pages/Index.razor)
