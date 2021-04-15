@@ -48,7 +48,10 @@ namespace BlazorApp.Data {
                 HomesList homesList = (HomesList)formatter.Deserialize(fs);
                 foreach (Homes home in homesList.Homes) {
                     home.PhotoUrl = home.ID.ToString() + ".jpg";
-                    File.WriteAllBytes(_env.WebRootPath + "/Images/" + home.PhotoUrl, home.Photo);
+                    string imagesDirectory = _env.WebRootPath + "/Images/";
+                    if(!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(_env.WebRootPath + "/Images/");
+
+                    File.WriteAllBytes(imagesDirectory + home.PhotoUrl, home.Photo);
                 }
                 return homesList.Homes;
             }
